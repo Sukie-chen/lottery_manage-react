@@ -45,7 +45,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 // Tools like Cloud9 rely on this.
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3001;
 const HOST = process.env.HOST || '0.0.0.0';
 
 if (process.env.HOST) {
@@ -122,6 +122,7 @@ checkBrowsers(paths.appPath, isInteractive)
       urls.lanUrlForConfig
     );
     const devServer = new WebpackDevServer(compiler, serverConfig);
+    require('../src/setupProxy')(devServer)
     // Launch WebpackDevServer.
     devServer.listen(port, HOST, err => {
       if (err) {
