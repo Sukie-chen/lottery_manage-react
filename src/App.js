@@ -11,11 +11,12 @@ function App() {
   const [list, setList] = useState([])
   useEffect(()=>{
     axios.get('/api/live').then((res) => {
-      console.log(res.data)
+      // console.log(res.data)
       setList(res.data)
     })
   }, [])
   const newList = []
+  const [upload, setUpload] = useState([])
   // 改变奖品名称
   const handleChangeValue = (e, id) => {
     const data = newList.filter((item) => {
@@ -26,7 +27,6 @@ function App() {
     } else {
       newList.push({ award_id: id, award_name: e.target.value })
     }
-    console.log('value',newList)
   }
   // 改变奖品图片
   // const handleChangeImage = (e, id) => {
@@ -57,18 +57,17 @@ function App() {
     } else {
       newList.push({ award_id: id, award_weight: Number(e.target.value) })
     }
-    console.log('weight',newList)
   }
   const [isClick, setIsClick] = useState(false)
   const [hidden, setHidden] = useState(true)
   const handleClick = () => {
-    console.log('handleClick', newList)
+    setUpload(newList)
     setIsClick(true)
     setHidden(false)
   }
   const isCheck = ()=> {
-    console.log('ischeck',newList) //为空
-    axios.post('/api/live', { newList }).then((res) => {
+    console.log('ischeck',upload) //为空
+    axios.post('/api/live', { upload }).then((res) => {
       console.log(res.data)
     })
   }
