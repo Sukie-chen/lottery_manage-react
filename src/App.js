@@ -1,79 +1,109 @@
-import './App.css';
-import axios from "axios";
-import {useState} from "react";
+/*
+ * @Author: Sukie-Chen
+ * @Description:
+ * @Date: 2021-09-14 16:09:29
+ */
+import './App.css'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { Click } from './Click'
 function App() {
-    const list = [
-        {
-            id:1,
-            value: '奖品1',
-            weight: 5
-        },{
-            id:2,
-            value: '奖品3',
-            weight: 1
-        },{
-            id:3,
-            value: '奖品3',
-            weight: 2
-        },{
-            id:4,
-            value: '奖品4',
-            weight: 2
-        },{
-            id:6,
-            value: '奖品5',
-            weight: 3
-        },{
-            id:7,
-            value: '奖品6',
-            weight: 4
-        },{
-            id:8,
-            value: '奖品7',
-            weight: 5
-        },{
-            id:9,
-            value: '奖品8',
-            weight: 5
-        },
-    ]
-    //改变奖品名称
-    const handleChangeValue = (e, index) => {
-        list[index].value = e.target.value
+  const [list, setList] = useState([])
+  useEffect(()=>{
+    axios.get('/api/live').then((res) => {
+      console.log(res.data)
+      setList(res.data)
+    })
+  }, [])
+  const newList = []
+  // 改变奖品名称
+  const handleChangeValue = (e, id) => {
+    const data = newList.filter((item) => {
+      return item.award_id === id
+    })
+    if (data.length !== 0) {
+      data[0].award_name = e.target.value
+    } else {
+      newList.push({ award_id: id, award_name: e.target.value })
     }
-    //改变奖品权重等级
-    const handleChangeWeight = (e, index) => {
-        list[index].weight = Number(e.target.value)
+    console.log('value',newList)
+  }
+  // 改变奖品图片
+  // const handleChangeImage = (e, id) => {
+    // const file = e.target.files[0]
+    // const reader = new FileReader()
+    // reader.readAsDataURL(file)
+    // reader.onload = (e) => {
+    //   console.log(e)
+    // }
+    // console.log(file.path)
+    // const data = newList.filter((item) => {
+    //   return item.award_id === id
+    // })
+    // if (data.length !== 0) {
+    //   data[0].award_image = 1
+    // } else {
+    //   newList.push({ award_id: id, award_image:11 })
+    // }
+    
+  // }
+  // 改变奖品权重等级
+  const handleChangeWeight = (e, id) => {
+    const data = newList.filter((item) => {
+      return item.award_id === id
+    })
+    if (data.length !== 0) {
+      data[0].award_weight = Number(e.target.value)
+    } else {
+      newList.push({ award_id: id, award_weight: Number(e.target.value) })
     }
-    const [isClick, setIsClick] =useState(false)
-    const handleClick = () => {
-        setIsClick(true)
-        // console.log(list)
-        axios.post('/api/live',{list: list}).then((res) => {
-            console.log(res.data)
-        })
-    }
+    console.log('weight',newList)
+  }
+  const [isClick, setIsClick] = useState(false)
+  const [hidden, setHidden] = useState(true)
+  const handleClick = () => {
+    console.log('handleClick', newList)
+    setIsClick(true)
+    setHidden(false)
+  }
+  const isCheck = ()=> {
+    console.log('ischeck',newList) //为空
+    axios.post('/api/live', { newList }).then((res) => {
+      console.log(res.data)
+    })
+  }
   return (
     <div>
-        {
-            list.map((item,index) =>{
-                return <li key={item.id} className="list">
-                        <div>第{item.id}格修改：</div>
-                        奖品名称：<input type="text" defaultValue={item.value} disabled={ isClick} onChange={e=>handleChangeValue(e, index)}/>
-                        奖品权重：<select defaultValue={item.weight} disabled={isClick} onChange={e=>handleChangeWeight(e, index)}>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
-                    </li>
-
-            })
-        }
-        <button onClick={()=>handleClick(true)}>上传</button>
+      {list.map((item) => {
+        return (
+          <li key={item.award_id} className='list'>
+            <div>第{item.award_id}格修改：</div>
+            奖品名称：
+            <input
+              type='text'
+              defaultValue={item.award_name}
+              disabled={isClick}
+              onChange={(e) => handleChangeValue(e, item.award_id)}
+            />
+            奖品权重：
+            <select
+              defaultValue={item.award_weight}
+              disabled={isClick}
+              onChange={(e) => handleChangeWeight(e, item.award_id)}
+            >
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </li>
+        )
+      })}
+      <button onClick={() => handleClick(true)}>上传</button>
+      <Click isHidden={hidden} isCheck={isCheck} setHidden={setHidden}/>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
